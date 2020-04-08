@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 
 namespace laba2
@@ -76,10 +76,10 @@ namespace laba2
 
         public void Core()
         {
-            //level 2 -> (5b1 - c1), (B2 - 10C2), y1
+            //level 2 -> (5b1 - c1), (B2 + 10C2), y1
             Parallel.Invoke(
-                () => { tmp2_1 = (b1 * 5) + c1; },
-                () => { tmp2_2 = B2 - (C2 * 10); },
+                () => { tmp2_1 = (b1 * 5) - c1; },
+                () => { tmp2_2 = B2 + (C2 * 10); },
                 () => { y1 = A * b; }
                 );
 
@@ -97,14 +97,14 @@ namespace laba2
                 () => { tmp4_3 = y1.Transposed() * Y3; }
                 );
 
-            //level 5 -> tmp5_1 = (Y3squared * y2), (tmp4_1 + y1), (tmp4_3 * y1)
+            //level 5 -> tmp5_1 = (Y3squared * y2), ((Y3 * y2) + y1), ((y1' * Y3) * y1)
             Parallel.Invoke(
                 () => { tmp5_1 = Y3squared * y2; },
                 () => { tmp5_2 = tmp4_1 + y1; },
                 () => { tmp5_3 = tmp4_3 * y1; }
                 );
 
-            //level 6 -> tmp6_1 = (tmp4_2 * tmp5_1), tmp6_2 = (tmp5_3 + y2)
+            //level 6 -> tmp6_1 = ((y1 * y2')* (Y3squared * y2)), tmp6_2 = ((y1' * Y3) * y1+ y2')
             Parallel.Invoke(
                 () => { tmp6_1 = tmp4_2 * tmp5_1; },
                 () => { tmp6_2 = tmp5_3 + y2; }
@@ -114,9 +114,12 @@ namespace laba2
             //без Parallel.Invoke тому що 1 завдання
             tmp7_1 = tmp5_2 + tmp6_1;
 
+            //tmp6_2.ShowMatrix("TMP6_2");
+            //tmp7_1.ShowMatrix("TMP7_1");
             //result
             result = tmp6_2 * tmp7_1;
 
+            
 
             Final();
         }
@@ -143,8 +146,9 @@ namespace laba2
                 result.ShowMatrix("result");
                 Console.WriteLine("If ended");
             }
-            Console.WriteLine("Press key to exit");
-            Console.ReadKey();
+            Console.WriteLine("Press enter to exit");
+            while (Console.ReadKey().Key != ConsoleKey.Enter) {
+            }
         }
     }
 
@@ -204,13 +208,13 @@ namespace laba2
         public void FromKeyboard(string name)
         {
             //Вводити рядково
-            Console.WriteLine("Entering {0}", name);
+            Console.WriteLine("Enter {0}", name);
             for (int i = 0; i < n; i++)
             {
-                var values = (Console.ReadLine().Split(' '));
                 for (int j = 0; j < n; j++)
                 {
-                    matrix[i, j] = double.Parse(values[j]);
+                    Console.Write("{0}[{1}, {2}] = ",name, i, j);
+                    matrix[i, j] = Convert.ToInt32(Console.ReadLine());
                 }
             }
         }
@@ -340,17 +344,10 @@ namespace laba2
             {
                 for (int j = 0; j < m1.n; j++)
                 {
-                    double tmp = 0;
-                    for (int k = 0; k < m1.n; k++)
-                    {
-                        tmp += m1[i, k] * value;
-                    }
-                    result[i, j] = tmp;
+                    result[i, j] = m1[i, j] * value;
                 }
             }
             return result;
-           
         }
-       
     }
 }
